@@ -1,5 +1,5 @@
 {
-  "name": "video-url-extractor-worker",
+  "name": "patcg",
   "version": "1.0.0",
   "description": "Cloudflare Worker to extract video URLs",
   "main": "worker.js",
