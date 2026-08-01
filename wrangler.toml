@@ -1,23 +1,16 @@
-# wrangler.toml
-name = "iframe-embedder"
+# wrangler.toml - Corrected version
+name = "patcg"
 main = "src/index.js"
-compatibility_date = "2024-01-01"
+compatibility_date = "2024-12-18"
 
-# Account ID (optional - can be set via CLI or environment)
-# account_id = "your-account-id"
+# Remove unsupported fields
+# logging was removed as it's not supported in this version
 
 # Environment variables
 [vars]
 # You can add environment-specific variables here
-# EXAMPLE_VAR = "value"
 
 # Routes configuration
-# routes = [
-#   { pattern = "embed.example.com/*", zone_name = "example.com" }
-# ]
-
-# Custom domains (optional)
-# [env.production]
 # routes = [
 #   { pattern = "embed.example.com/*", zone_name = "example.com" }
 # ]
@@ -25,67 +18,23 @@ compatibility_date = "2024-01-01"
 # Observability
 [observability]
 enabled = true
-head_sampling_rate = 1
 
-# Logging
-[logging]
-enable_debug = true
-
-# Usage model (uncomment if you want to use the new pricing model)
-# usage_model = "bundled"  # or "unbound"
-
-# Minimum required resources
+# Limits
 [limits]
 cpu_ms = 50
-max_script_size = 1024
 
-# Cron triggers (optional - for scheduled tasks)
-# [triggers]
-# crons = ["0 0 * * *"]
-
-# Durable Objects (if needed)
+# If you need durable objects, uncomment and fix the binding format
 # [[durable_objects]]
 # bindings = [
 #   { name = "COUNTER", class_name = "Counter" }
 # ]
 
-# R2 Buckets (if needed)
-# [[r2_buckets]]
-# binding = "MY_BUCKET"
-# bucket_name = "my-bucket"
-
-# KV Namespaces (if needed)
+# If you need KV namespaces, uncomment and fix
 # [[kv_namespaces]]
 # binding = "MY_KV"
 # id = "your-kv-id"
 
-# D1 Databases (if needed)
-# [[d1_databases]]
-# binding = "DB"
-# database_name = "my-database"
-# database_id = "your-database-id"
-
-# Queue producers (if needed)
-# [[queues.producers]]
-# binding = "MY_QUEUE"
-# queue = "my-queue"
-
-# Queue consumers (if needed)
-# [[queues.consumers]]
-# queue = "my-queue"
-# max_batch_size = 100
-# max_batch_timeout = 30
-
-# AI bindings (if needed)
-# [ai]
-# binding = "AI"
-
-# Browser rendering (if needed)
-# [browser]
-# binding = "MYBROWSER"
-
-# Version metadata
-[version_metadata]
-type = "git"
-commit_hash = "{{ commit_hash }}"
-commit_time = "{{ commit_time }}"
+# If you need R2 buckets, uncomment and fix
+# [[r2_buckets]]
+# binding = "MY_BUCKET"
+# bucket_name = "my-bucket"
