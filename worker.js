@@ -1,8 +1,7 @@
-// Cloudflare Worker to fetch video stream URL from peachify.top
+// Cloudflare Worker to fetch the binary video URL from peachify.top
 
 export default {
   async fetch(request, env, ctx) {
-    // Handle CORS
     if (request.method === 'OPTIONS') {
       return new Response(null, {
         headers: {
@@ -52,44 +51,61 @@ async function extractVideoUrl() {
 
     const html = await response.text();
     
-    // Extract URLs using regex
-    const patterns = [
-      /https?:\/\/[a-zA-Z0-9-]+\.workers\.dev\/mp4-proxy[^\s"'<>]*/g,
+    // Look specifically for the binary URL pattern
+    // The URL format: https://*.workers.dev/mp4-proxy?uri=http...
+    const binaryPatterns = [
+      // Match mp4-proxy URLs with full query parameters
+      /https?:\/\/[a-zA-Z0-9-]+\.workers\.dev\/mp4-proxy\?[^\s"'<>]*/g,
+      // Match any workers.dev URL with bin or mp4-proxy
       /https?:\/\/[a-zA-Z0-9-]+\.workers\.dev\/[^\s"'<>]*/g,
-      /https?:\/\/[^\s"'<>]+\.m3u8[^\s"'<>]*/g,
-      /https?:\/\/[^\s"'<>]+\.mp4[^\s"'<>]*/g,
-      /https?:\/\/[^\s"'<>]+tripplestream\.online[^\s"'<>]*/g
+      // Match URLs with uri= parameter
+      /https?:\/\/[^\s"'<>]+\?uri=[^\s"'<>]*/g,
+      // Match tripplestream URLs
+      /https?:\/\/[^\s"'<>]+tripplestream\.online[^\s"'<>]*/g,
     ];
     
     let allUrls = [];
-    patterns.forEach(pattern => {
+    binaryPatterns.forEach(pattern => {
       const matches = html.match(pattern);
       if (matches) {
         allUrls = allUrls.concat(matches);
       }
     });
     
-    // Also check script tags
+    // Also check script tags for encoded URLs
     const scriptMatches = html.match(/<script[^>]*>([\s\S]*?)<\/script>/gi);
     if (scriptMatches) {
       scriptMatches.forEach(script => {
-        patterns.forEach(pattern => {
+        binaryPatterns.forEach(pattern => {
           const matches = script.match(pattern);
           if (matches) {
             allUrls = allUrls.concat(matches);
           }
         });
+        
+        // Also look for URL encoded in JavaScript variables
+        const jsUrlMatches = script.match(/["'](https?:\/\/[^"']*workers\.dev[^"']*)["']/g);
+        if (jsUrlMatches) {
+          jsUrlMatches.forEach(match => {
+            const url = match.replace(/["']/g, '');
+            allUrls.push(url);
+          });
+        }
       });
     }
     
     // Remove duplicates
     const uniqueUrls = [...new Set(allUrls)];
     
-    // Find proxy URL (prioritize mp4-proxy)
-    let proxyUrl = uniqueUrls.find(url => url.includes('mp4-proxy'));
-    if (!proxyUrl) {
-      proxyUrl = uniqueUrls.find(url => url.includes('workers.dev'));
-    }
+    // Filter specifically for mp4-proxy with uri parameter (the binary URL)
+    const binaryUrl = uniqueUrls.find(url => 
+      url.includes('mp4-proxy') && url.includes('uri=')
+    );
+    
+    // If no binary URL found, try to find any workers.dev URL
+    const fallbackUrl = uniqueUrls.find(url => 
+      url.includes('workers.dev') && url.includes('?')
+    );
     
     // Find m3u8 URL
     const m3u8Url = uniqueUrls.find(url => url.includes('.m3u8'));
@@ -101,11 +117,14 @@ async function extractVideoUrl() {
       success: true,
       timestamp: new Date().toISOString(),
       target_url: TARGET_URL,
-      proxy_url: proxyUrl || null,
+      // The binary URL is the one you want
+      binary_url: binaryUrl || fallbackUrl || null,
       m3u8_url: m3u8Url || null,
       mp4_url: mp4Url || null,
       all_urls: uniqueUrls,
-      total_found: uniqueUrls.length
+      total_found: uniqueUrls.length,
+      // Extract the actual video URL from the uri parameter if present
+      extracted_video_url: binaryUrl ? extractUriParam(binaryUrl) : null
     };
     
     return new Response(JSON.stringify(result, null, 2), {
@@ -129,6 +148,20 @@ async function extractVideoUrl() {
         'Access-Control-Allow-Origin': '*',
       }
     });
+  }
+}
+
+// Helper function to extract the video URL from the uri parameter
+function extractUriParam(url) {
+  try {
+    const urlObj = new URL(url);
+    const uri = urlObj.searchParams.get('uri');
+    if (uri) {
+      return decodeURIComponent(uri);
+    }
+    return null;
+  } catch (e) {
+    return null;
   }
 }
 
