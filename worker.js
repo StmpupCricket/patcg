@@ -108,12 +108,6 @@ async function extractVideoUrl() {
       total_found: uniqueUrls.length
     };
     
-    // Store in KV if available
-    if (typeof env !== 'undefined' && env.VIDEO_URLS) {
-      await env.VIDEO_URLS.put('latest', JSON.stringify(result));
-      await env.VIDEO_URLS.put('history_' + Date.now(), JSON.stringify(result));
-    }
-    
     return new Response(JSON.stringify(result, null, 2), {
       headers: {
         'Content-Type': 'application/json',
@@ -152,4 +146,4 @@ async function getStatus() {
       'Access-Control-Allow-Origin': '*',
     }
   });
-          }
+}
