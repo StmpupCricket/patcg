@@ -1,13 +1,17 @@
 {
   "name": "patcg",
   "version": "1.0.0",
-  "description": "Cloudflare Worker to extract video URLs",
-  "main": "worker.js",
+  "description": "URL embedder with sandbox bypass",
+  "main": "src/index.js",
   "scripts": {
+    "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "dev": "wrangler dev"
+    "publish": "wrangler publish"
+  },
+  "dependencies": {
+    "wrangler": "^3.114.17"
   },
   "devDependencies": {
-    "wrangler": "^3.0.0"
+    "wrangler": "^3.114.17"
   }
 }
