@@ -1,0 +1,14 @@
+{
+  "name": "video-url-extractor-worker",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker to extract video URLs",
+  "main": "worker.js",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "test": "node test.js"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}
