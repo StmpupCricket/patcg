@@ -2,14 +2,11 @@ name = "patcg"
 main = "worker.js"
 compatibility_date = "2024-01-01"
 
-# Environment variables only - NO KV namespace
 [vars]
 DEBUG = "false"
 
-# Production environment
 [env.production]
 vars = { DEBUG = "false" }
 
-# Development environment
 [env.dev]
 vars = { DEBUG = "true" }
