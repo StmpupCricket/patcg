@@ -1,11 +1,11 @@
-name = "video-url-extractor"
+name = "patcg"  # Changed to match your Cloudflare project name
 main = "worker.js"
 compatibility_date = "2024-01-01"
 
-# Optional: Add KV namespace for storing results
-[[kv_namespaces]]
-binding = "VIDEO_URLS"
-id = "your-kv-namespace-id"
+# Remove KV namespace or comment it out if you don't have one
+# [[kv_namespaces]]
+# binding = "VIDEO_URLS"
+# id = "your-kv-namespace-id"  # Replace with actual ID if you have one
 
 # Environment variables
 [vars]
